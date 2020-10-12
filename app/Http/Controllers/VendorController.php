@@ -6,6 +6,7 @@ use App\Vendor;
 use App\vendorpicture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 use DB;
 
@@ -170,7 +171,11 @@ class VendorController extends Controller
     //upload image 
     public function vendorpicture (Request $request)
     {
-      
+        $validator = Validator::make($request->all(), [
+            'company_name' => 'required',
+          
+        ]);
+        if ($validator->passes()) {
        $fourRandom = hexdec(uniqid());
        $fourRandomDigit =$fourRandom; 
        $username = Auth::user()->name;
@@ -395,10 +400,11 @@ class VendorController extends Controller
         //                 'ownername'=>$request->ownername,
         //                 'gstno'=>$request->gstno]
         //             );
-       
-        return response()
-           ->json(["message" => "Media added successfully"]);
- 
+     
+		return response()->json(['success'=>'Added new records.']);
+       }
+
+    	return response()->json(['error'=>$validator->errors()->all()]);
 
 
 

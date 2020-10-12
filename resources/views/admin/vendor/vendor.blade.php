@@ -16,15 +16,17 @@
 @endif
 <div class="container">
     <div class="row">
-    @if($errors->any())
-        <div class="alert alert-danger">
+    <div class="alert alert-danger print-error-msg" style="display: {{ count($errors) > 0 ? 'block' : 'none' }}">
         <ul>
-        @foreach($errors->all() as $error)
-        <li>{{ $error }}</li>
+        @foreach($errors as $error)
+          <li>{{$error['error']}}</li> 
         @endforeach
         </ul>
-        </div>
-    @endif
+    </div>
+    <!-- <div class="alert alert-danger print-error-msg" style="display:none">
+        <ul></ul>
+    </div> -->
+
         <form  id="post-form" method="post" action="{{ route('vendor.store') }}" enctype="multipart/form-data">
         {{ csrf_field() }}
         <div class="col-md-12"><h2>Vendor Detail</h2>
@@ -58,18 +60,16 @@
                 <div class="form-group">
                 <label for="Vendor PIcture">Vendor PIcture (only one):</label>
                 <br />
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick1" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="vendorpicture" name="vendorpicture[]" multiple />
-                <span id="mgs_ta">
-    
-               </span>
+               
                 </div>
                 <div class="form-group">
                 <label for="Vendor GST">Vendor GST (only one):</label>
                 <br />
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick2" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="vendorgst" name="vendorgst[]" multiple />
@@ -79,7 +79,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                 <label for="Vendor Pan">Owner Personal  Doc. :</label>
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick3" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="ownerpersonaldoc" name="ownerpersonaldoc[]" multiple />
@@ -87,35 +87,35 @@
                 <div class="form-group">
                 <label for="Vendor Pan">CIN  Photo :</label>
                 <br />
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick4" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="cinphoto" name="cinphoto[]" multiple />
                 </div>
                 <div class="form-group">
                 <label for="Vendor Name">Pan No. Upload file </label>
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick5" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="panimage" name="panimage[]" multiple />
                 </div>
                 <div class="form-group">
                 <label for="Vendor Name">GST Upload file </label>
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick6" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="gstupload" name="gstupload[]" multiple />
                 </div>   
                 <div class="form-group">
                 <label for="Vendor Pan">Company Doc. :</label>
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick7" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="companydoc" name="companydoc[]" multiple />
                 </div>
                 <div class="form-group">
                 <label for="Vendor Pan">Other Doc. :</label>
-                <span> 
+                <span id="loadimg"> 
                 <img class="tick8" src="http://icons.iconarchive.com/icons/icojam/blue-bits/24/symbol-check-icon.png" />
                 </span>
                 <input type="file" class="form-control" id="otherdoc" name="otherdoc[]" multiple />
@@ -248,17 +248,27 @@
                 contentType: false,
                 processData: false,
                 data: image_upload,
-                success: function(result) {
-                  alert('data Saved');
-                    $("div.alert p").text(result.message);
-                    $('#image-upload').val("");
-                    setTimeout(function() {
-                        $("div.alert").hide();
-                    }, 3000); // 5 secs
+                success: function(data) {
+                    $('#loadimg').hide();
+                 document.getElementById("post-form").reset();
+                 if($.isEmptyObject(data.error)){
+                        alert(data.success);
+                    }else{
+                        printErrorMsg(data.error);
+                    }
                 }
+                
             });
         });
+        function printErrorMsg (msg) {
+            $(".print-error-msg").find("ul").html('');
+            $(".print-error-msg").css('display','block');
+            $.each( msg, function( key, value ) {
+                $(".print-error-msg").find("ul").append('<li>'+value+'</li>');
+            });
+        }
     });
+
 
 
     //   $.ajaxSetup({
